@@ -1,0 +1,64 @@
+Формат хранения разряженной матрицы:
+
+1)  Матрица хранится в виде списка структур. Структура состоит из индекса строки(k), столбца(m) и самого значения(n).
+
+2)  Счет индексов ведется с 0.
+
+3)  В классе мы храним сам список структур(el), кол-во строчек(row_size), кол-во столбцов(column_size), кол-во ненулевых элементов(nonzero_cnt), точность сравнения(accuracy). Все поля, кроме точности, находятся в private-области. По умолчанию, точность = 0.0001. 
+
+4)  Если матрица полностью состоит из нулей, то мы задаем список из одной структуры, в которой храним 1 элемент со значением 0. Кол-во ненулевых элементов считается равным 0.
+
+5)  Исключения не обрабатываются. Нет проверки на размеры массивов при умножении и сложении, нет проверки индексов для геттера и сеттера.
+
+6)   SparseMatrix (int a, int b); - конструктор инициализации. Просит ввести элементы из стандартного потока ввода - перед этим выводит приветственное сообщение. Если все элементы = 0, см. 4)
+
+7)  SparseMatrix (Element*, int, int, int); - конструктор инициализации, использующийся при операции умножения и сложения(передается полученный массив структур, кол-во ненулевых элементов, кол-во столбцов, кол-во строк соответственно)
+
+8)  ~SparseMatrix (); - деструктор умолчания. Освобождает память, выделенную под список структур.
+     
+9)  double get(int i, int j) const; - возвращает значение n_ij 
+
+10) void set(int, int, double); - изменяет значение элемента n_ij на double (параметры - номер строки, номер столбца, новое значение)
+    
+11) int num_rows(); - возвращаем кол-во строк
+12) int num_columns(); - возвращаем кол-во столбцов
+    
+13) bool operator==(const SparseMatrix& obj) const; - проверяем на равенство
+    bool operator!=(const SparseMatrix& obj) const; - проверяем на неравенстро
+    Проверяем с точностью accuracy, пользователь может её менять
+    
+14) SparseMatrix operator+(const SparseMatrix& obj) const; - переопределение операции сложения для двух матриц
+
+15) SparseMatrix operator*(const SparseMatrix& obj) const; - переопределение операции умножения для двух матриц
+    
+16) class IndexArithmetic - класс, созданный для неконстантной индексной арифметики. Хранит список структур и значение строки(первого [])
+16.1) IndexArithmetic operator[] (int i); - метод класса SparseMatrix, возвращает объекс класса IndexArithmetic при операции [], примерненной к объекту класса SparseMatrix
+16.2) IndexArithmetic(SparseMatrix& m, int i) : matrx(m), our_row(i) {} - конструктор класса IndexArithmetic, инициализирует объекта класса IndexArithmetic
+16.3) double& operator [] (int j); - метод класса IndexArithmetic, возвращает адрес элемента n_ij азреженной матрицы
+    
+17) class IndexArithmetic_const - класс, созданный на подобии класса IndexArithmetic и работающий для const объектов
+17.1) IndexArithmetic_const operator[] (int i) const; 
+17.2) IndexArithmetic_const(const SparseMatrix& m, int i) : matrx(m), our_row(i) {} 
+17.3) double& operator [] (int j); 
+
+18) class AddressArithmetic_1 - класс для первого сложения(для строки). Хранит список структур, номер строки
+18.1) AddressArithmetic_1 operator+(int i); - метод класса SparseMatrix, возвращает объект класса AddressArithmetic_1
+18.2) AddressArithmetic_1(SparseMatrix& m, int i) : matrx(m), our_row(i) {} - конструктор класса AddressArithmetic_1, инициализирует объекта класса AddressArithmetic_1
+18.3) AddressArithmetic_2 operator* (); - метод класса AddressArithmetic_1, возвращает объект класса AddressArithmetic_2(для первой звездочки)
+   18.0) class AddressArithmetic_2 - класс для второго сложения(для столбца). Хранит список структур и номер строки.
+   18.0.1) AddressArithmetic_2(AddressArithmetic_1& m) : matrx(m.matrx), our_row(m.our_row) {} - конструктор класса AddressArithmetic_2, инициализирует объекта класса AddressArithmetic_2
+   18.0.2) double* operator+ (int j); - метод класса AddressArithmetic_2, нужен для второго сложения. Возвращает указатель на double(что бы потом разыменовали по самой внешней звездочке)
+
+
+19) class AddressArithmetic_1_const - та же идея, что и в 18), только реализованно для константных объектов.
+
+
+
+
+
+
+
+
+
+
+
